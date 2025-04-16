@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LibreTranslate 在线翻译</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a6fa5;
+      --secondary: #166088;
+      --light: #f8f9fa;
+      --dark: #343a40;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f5f5;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .translate-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .translate-box {
+        flex-direction: row;
+      }
+    }
+
+    .text-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+      font-size: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: var(--secondary);
+    }
+
+    .swap-btn {
+      background: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      align-self: center;
+      cursor: pointer;
+    }
+
+    .swap-btn:hover {
+      color: var(--secondary);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .loading i {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-language"></i> LibreTranslate 在线翻译</h1>
+    
+    <div class="translate-box">
+      <!-- 输入框 -->
+      <div class="text-box">
+        <div class="controls">
+          <select id="sourceLang">
+            <option value="auto">自动检测</option>
+          </select>
+          <button id="detectLang"><i class="fas fa-search"></i> 检测语言</button>
+        </div>
+        <textarea id="sourceText" placeholder="输入要翻译的文本..."></textarea>
+      </div>
+
+      <!-- 交换按钮 -->
+      <button class="swap-btn" id="swapLangs" title="交换语言">
+        <i class="fas fa-exchange-alt"></i>
+      </button>
+
+      <!-- 输出框 -->
+      <div class="text-box">
+        <div class="controls">
+          <select id="targetLang"></select>
+          <button id="translateBtn"><i class="fas fa-exchange-alt"></i> 翻译</button>
+        </div>
+        <textarea id="targetText" placeholder="翻译结果..." readonly></textarea>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">
+      <i class="fas fa-spinner"></i> 翻译中...
+    </div>
+
+    <footer>
+      <p>使用 <a href="https://libretranslate.com/" target="_blank">LibreTranslate</a> API | 开源免费翻译</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      let languages = [];
+
+      // DOM 元素
+      const sourceText = document.getElementById('sourceText');
+      const targetText = document.getElementById('targetText');
+      const sourceLang = document.getElementById('sourceLang');
+      const targetLang = document.getElementById('targetLang');
+      const translateBtn = document.getElementById('translateBtn');
+      const detectLangBtn = document.getElementById('detectLang');
+      const swapLangsBtn = document.getElementById('swapLangs');
+      const loading = document.getElementById('loading');
+
+      // 加载支持的语言
+      async function loadLanguages() {
+        try {
+          const response = await fetch('/languages');
+          languages = await response.json();
+          
+          // 填充语言选择框
+          languages.forEach(lang => {
+            sourceLang.innerHTML += `<option value="${lang.code}">${lang.name}</option>`;
+            targetLang.innerHTML += `<option value="${lang.code}">${lang.name}</option>`;
+          });
+
+          // 默认设置：英语 -> 中文
+          sourceLang.value = 'en';
+          targetLang.value = 'zh';
+        } catch (error) {
+          console.error("加载语言失败:", error);
+          alert("无法加载语言列表，请检查网络或 API 是否可用。");
+        }
+      }
+
+      // 翻译文本
+      async function translate() {
+        const text = sourceText.value.trim();
+        if (!text) {
+          alert("请输入要翻译的文本！");
+          return;
+        }
+
+        const source = sourceLang.value;
+        const target = targetLang.value;
+
+        if (source === target) {
+          targetText.value = text;
+          return;
+        }
+
+        loading.style.display = 'block';
+
+        try {
+          const response = await fetch('/translate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              text: text,
+              source: source,
+              target: target,
+            }),
+          });
+
+          const data = await response.json();
+          targetText.value = data.translatedText.data;
+        } catch (error) {
+          console.error("翻译失败:", error);
+          alert("翻译出错，请重试或检查 API 是否可用。");
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+
+      // 检测语言
+      async function detectLanguage() {
+        const text = sourceText.value.trim();
+        if (!text) {
+          alert("请输入要检测的文本！");
+          return;
+        }
+
+        loading.style.display = 'block';
+
+        try {
+          const response = await fetch('/detect', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              text: text,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.detectedLang) {
+            sourceLang.value = data.detectedLang;
+            alert(`检测到语言: ${languages.find(lang => lang.code === data.detectedLang)?.name || data.detectedLang}`);
+          }
+        } catch (error) {
+          console.error("语言检测失败:", error);
+          alert("检测失败，请重试！");
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+
+      // 交换语言
+      function swapLanguages() {
+        const tempLang = sourceLang.value;
+        sourceLang.value = targetLang.value;
+        targetLang.value = tempLang;
+
+        const tempText = sourceText.value;
+        sourceText.value = targetText.value;
+        targetText.value = tempText;
+      }
+
+      // 事件监听
+      translateBtn.addEventListener('click', translate);
+      detectLangBtn.addEventListener('click', detectLanguage);
+      swapLangsBtn.addEventListener('click', swapLanguages);
+
+      // 初始化
+      loadLanguages();
+    });
+  </script>
+</body>
+</html>
