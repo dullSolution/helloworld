@@ -24,13 +24,13 @@ jobs:
           deno-version: v2.x
 
       - name: Build step
-        run: "deno run build"
+        run: "deno run"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "helloworld-53"
-          entrypoint: ""
+          entrypoint: "main.ts"
           root: "/"
           
           
