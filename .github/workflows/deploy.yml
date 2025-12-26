@@ -23,22 +23,14 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Install step
-        run: "deno install"
-
       - name: Build step
-        run: "deno task build"
+        run: "deno task preview"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "8translate307"
-          entrypoint: "/vite-project/src/main.ts"
+          entrypoint: "./src/main.ts"
           root: ""
           
           
