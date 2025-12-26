@@ -29,13 +29,16 @@ jobs:
           node-version: lts/*
 
       - name: Install step
-        run: "npm install"
+        run: "deno install"
+
+      - name: Build step
+        run: "deno task build"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "helloworld-53"
-          entrypoint: "main.ts"
+          project: "8translate307"
+          entrypoint: "/vite-project/src/main.ts"
           root: ""
           
           
