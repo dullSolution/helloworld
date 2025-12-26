@@ -17,3 +17,7 @@ Build production assets:
 ```
 $ deno task build
 ```
+
+```
+$ deno run /api/main.ts
+```
