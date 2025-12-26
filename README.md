@@ -1,35 +1,145 @@
-# demo4deno2
+# React Template with Vite and Deno
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+This is a GitHub template project to set up a [React](https://react.dev/) app
+with TypeScript running on [Deno](https://deno.com). It uses
+[Vite](https://vite.dev) as the dev server and an [oak](https://jsr.io/@oak/oak)
+http server on the backend to serve the built project.
 
-#### 软件架构
-软件架构说明
+## Features
 
+- React with TypeScript on the frontend
+- Vite for the development server
+- Deno for server-side JavaScript/TypeScript
+- Oak framework for building web applications
+- Static file serving
+- Router setup
 
-#### 安装教程
+## Getting Started
 
+### Prerequisites
 
+To run this app, you will need to have [Deno](https://docs.deno.com/runtime/)
+installed.
 
-#### 使用说明
+### Installation
 
+1. Create a new repository using this template. From the repository page, click
+   the "Use this template" button in the top right hand of the page:
 
+<img src="https://docs.github.com/assets/cb-76823/images/help/repository/use-this-template-button.png" alt="Use this template button" width="400">
 
-#### 参与贡献
+2. Use the Owner dropdown menu to select the account you want to own the
+   repository and set the repository name and visibility.
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+3. Clone the repository created to your local machine.
 
+```sh
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+```
 
-#### 特技
+> For a step by step guide to using a GitHub template
+> [follow this walkthrough](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+## Install the dependencies
+
+To install the dependencies for the frontend and backend, run the following
+command:
+
+```sh
+deno install
+```
+
+## Run the dev server with vite
+
+The app uses a Vite dev server to run in development mode. To start the dev
+server, run the following command:
+
+```sh
+deno run dev
+```
+
+## Build the app
+
+To build the app for production, run the following command:
+
+```sh
+deno run build
+```
+
+## Run the backend server
+
+The backend server uses Deno and the Oak framework to serve the built React app.
+To start the backend server, run the following command:
+
+```sh
+deno run serve
+```
+
+## Running Tests
+
+To run the tests, use the following command:
+
+```sh
+deno test -A
+```
+
+## Project Structure
+
+```sh
+. 
+├── client 
+│   ├── dist 
+│   ├── public 
+│   └── src 
+│       ├── App.tsx 
+│       └── main.tsx 
+└── server 
+    ├── main.ts 
+    ├── main_test.ts 
+    └── util 
+        └── routeStaticFilesFrom.ts
+```
+
+- `App.tsx`: The main React component
+- `main.tsx`: The entry point for the React app
+- `main.ts`: The entry point for the Deno server
+- `main_test.ts`: The test file for the Deno server
+- `routeStaticFilesFrom.ts`: A utility function to serve static files
+- `dist`: The output directory for the built React app
+- `public`: The public directory for the React app
+
+## Points of note
+
+The React app is contained in the `client` directory. This is also where Vite
+will install its dependencies and build the app.
+
+There is a `vite.config.ts` file in the root of the project that configures Vite
+to build the app in the `client/dist` directory and serve the app on port 3000.
+
+The `deno.json` file contains the tasks to run the dev server, build the app,
+and serve the app, along with the dependencies and the compiler configuration
+required to use JSX and React.
+
+The Deno server is contained in the `server` directory. The server serves the
+built React app from the `client/dist` directory and listens on port 8000. This
+is what should be used in production.
+
+## Deploying
+
+You can deploy the app with [Deno Deploy](https://dash.deno.com/new_project).
+
+1. Link your github account
+2. Select the repository
+3. Give the project a name
+4. Set the "Build Step" to `deno task build`
+5. Set the entry point to `./server/main.ts`
+6. Click 'deploy project'
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License.
