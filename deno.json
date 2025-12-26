@@ -1,13 +1,17 @@
 {
   "tasks": {
-        "dev":"deno run  --allow-net --allow-env --allow-read --watch main.ts"
+    "dev": "deno run -A --node-modules-dir npm:vite",
+    "build": "deno run -A --node-modules-dir npm:vite build",
+    "preview": "deno run -A --node-modules-dir npm:vite preview",
+    "serve": "deno run --allow-net --allow-read jsr:@std/http@1/file-server dist/"
+  },
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"]
   },
   "imports": {
-    "@deno-plc/vite-plugin-deno": "jsr:@deno-plc/vite-plugin-deno@^2.3.3",
-    "@lucidity/vite": "jsr:@lucidity/vite@^0.1.2",
-    "@std/assert": "jsr:@std/assert@1",
-    "express": "npm:express@4.17.3",
-    "vite": "npm:vite@3.2.5"
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "@vitejs/plugin-vue": "npm:@vitejs/plugin-vue@^5.2.1",
+    "vite": "npm:vite@^6.1.1",
+    "vue": "npm:vue@^3.5.13"
   }
-
 }
